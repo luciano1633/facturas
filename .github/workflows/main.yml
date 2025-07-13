@@ -59,12 +59,24 @@ jobs:
           echo "${{ secrets.EC2_SSH_KEY }}" > ~/.ssh/id_rsa
           chmod 600 ~/.ssh/id_rsa
 
-      # Paso 9: Conectarse a EC2 y desplegar el contenedor
-      - name: SSH commands to deploy
+      # Paso 9: Conectarse a EC2 y desplegar con Docker Compose
+      - name: Deploy to EC2 with Docker Compose
         run: |
           ssh -i ~/.ssh/id_rsa -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null ${{ secrets.USER_SERVER }}@${{ secrets.EC2_HOST }} << 'EOF'
+            # Navega al directorio del proyecto (asegúrate de que la ruta sea correcta)
+            # cd /ruta/a/tu/proyecto
+            
+            # Exporta el nombre de la imagen como una variable de entorno
+            export DOCKER_IMAGE=${{ secrets.DOCKERHUB_USERNAME }}/my-app:latest
+            
+            # Inicia sesión en DockerHub
             echo ${{ secrets.DOCKERHUB_TOKEN }} | docker login -u ${{ secrets.DOCKERHUB_USERNAME }} --password-stdin
-            docker pull ${{ secrets.DOCKERHUB_USERNAME }}/my-app:latest
-            docker stop my-app || true && docker rm my-app || true
-            docker run -d --name my-app -p 8080:8080 ${{ secrets.DOCKERHUB_USERNAME }}/my-app:latest
+            
+            # Descarga la última versión de la imagen de la aplicación
+            docker-compose pull app
+            
+            # Levanta los servicios (app y rabbitmq). 
+            # Docker Compose recreará solo el contenedor 'app' si es el único que ha cambiado.
+            docker-compose up -d
           EOF
+

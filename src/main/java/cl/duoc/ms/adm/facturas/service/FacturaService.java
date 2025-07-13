@@ -15,15 +15,19 @@ import java.util.Optional;
 import org.springframework.web.multipart.MultipartFile;
 import java.time.LocalDateTime;
 
+import cl.duoc.ms.adm.facturas.service.ProducirMensajeService;
+
 @Service
 public class FacturaService {
     private final FacturaRepository facturaRepository;
     private final AwsS3Service awsS3Service;
+    private final ProducirMensajeService producirMensajeService;
     private final String BUCKET_NAME = "bucketduocpruebas3";
 
-    public FacturaService(FacturaRepository facturaRepository, AwsS3Service awsS3Service) {
+    public FacturaService(FacturaRepository facturaRepository, AwsS3Service awsS3Service, ProducirMensajeService producirMensajeService) {
         this.facturaRepository = facturaRepository;
         this.awsS3Service = awsS3Service;
+        this.producirMensajeService = producirMensajeService;
     }
 
     public List<Factura> listarFacturas() {
@@ -34,35 +38,10 @@ public class FacturaService {
         return facturaRepository.findById(id);
     }
 
-    public Factura guardarFactura(Factura factura) {
-        // Guardar la factura para obtener el ID
-        Factura facturaGuardada = facturaRepository.save(factura);
-
-        try {
-            // Generar PDF
-            ByteArrayOutputStream baos = new ByteArrayOutputStream();
-            Document document = new Document();
-            PdfWriter.getInstance(document, baos);
-            document.open();
-            document.add(new Paragraph("Factura generada automáticamente"));
-            document.add(new Paragraph("ID Factura: " + facturaGuardada.getId()));
-            document.add(new Paragraph("Cliente ID: " + facturaGuardada.getClienteId()));
-            document.add(new Paragraph("Fecha: " + facturaGuardada.getFecha()));
-            document.add(new Paragraph("Total: " + facturaGuardada.getTotal()));
-            document.close();
-
-            // Subir a S3
-            String key = generarKeyS3(facturaGuardada);
-            awsS3Service.upload(BUCKET_NAME, key, baos.toByteArray());
-            facturaGuardada.setArchivoPath(key);
-
-            // Actualizar la factura con la ruta del archivo S3
-            return facturaRepository.save(facturaGuardada);
-        } catch (Exception e) {
-            // En caso de error al generar o subir el PDF, se elimina la factura creada.
-            facturaRepository.deleteById(facturaGuardada.getId());
-            throw new RuntimeException("Error al generar o subir el PDF de la factura. La factura ha sido revertida.", e);
-        }
+    public void guardarFactura(Factura factura) {
+        // Criterio 3: Enviar la solicitud de creación de factura a una cola de RabbitMQ
+        // para su procesamiento asíncrono.
+        producirMensajeService.enviarObjeto(factura);
     }
 
     public Factura actualizarFacturaS3(Long id, MultipartFile file) {

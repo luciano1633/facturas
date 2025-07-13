@@ -38,13 +38,14 @@ public class FacturaController {
     }
 
     @PostMapping
-    public FacturaDTO agregar(@RequestBody FacturaDTO facturaDTO) {
+    public ResponseEntity<String> agregar(@RequestBody FacturaDTO facturaDTO) {
         Factura factura = toEntity(facturaDTO);
         if (factura.getFecha() == null) {
             factura.setFecha(LocalDateTime.now());
         }
-        Factura guardada = facturaService.guardarFactura(factura);
-        return toDTO(guardada);
+        facturaService.guardarFactura(factura);
+        String mensaje = "Solicitud de factura recibida. Se está procesando de forma asíncrona.";
+        return ResponseEntity.accepted().body(mensaje);
     }
 
     @PutMapping("/actualizar/{id}")
