@@ -63,8 +63,14 @@ jobs:
       - name: Deploy to EC2 with Docker Compose
         run: |
           ssh -i ~/.ssh/id_rsa -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null ${{ secrets.USER_SERVER }}@${{ secrets.EC2_HOST }} << 'EOF'
-            # Navega al directorio del proyecto (asegúrate de que la ruta sea correcta)
-            # cd /ruta/a/tu/proyecto
+            # Navega al directorio del proyecto. Si no existe, clona el repositorio.
+            if [ -d "facturas" ]; then
+              cd facturas
+              git pull
+            else
+              git clone https://github.com/${{ github.repository }}.git facturas
+              cd facturas
+            fi
             
             # Exporta el nombre de la imagen como una variable de entorno
             export DOCKER_IMAGE=${{ secrets.DOCKERHUB_USERNAME }}/my-app:latest
@@ -72,11 +78,9 @@ jobs:
             # Inicia sesión en DockerHub
             echo ${{ secrets.DOCKERHUB_TOKEN }} | docker login -u ${{ secrets.DOCKERHUB_USERNAME }} --password-stdin
             
-            # Descarga la última versión de la imagen de la aplicación
+            # Descarga la última versión de la imagen de la aplicación desde Docker Hub
             docker-compose pull app
             
-            # Levanta los servicios (app y rabbitmq). 
-            # Docker Compose recreará solo el contenedor 'app' si es el único que ha cambiado.
-            docker-compose up -d
+            # Levanta los servicios. --force-recreate asegura que el contenedor de la app se actualice.
+            docker-compose up -d --force-recreate app
           EOF
-
