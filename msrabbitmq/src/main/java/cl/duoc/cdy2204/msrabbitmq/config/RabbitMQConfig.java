@@ -1,4 +1,6 @@
-package cl.duoc.ms.adm.facturas.config;
+package cl.duoc.cdy2204.msrabbitmq.config;
+
+import java.util.Map;
 
 import org.springframework.amqp.core.Binding;
 import org.springframework.amqp.core.BindingBuilder;
@@ -13,8 +15,8 @@ import org.springframework.context.annotation.Configuration;
 public class RabbitMQConfig {
 
 	public static final String MAIN_QUEUE = "myQueue";
-	public static final String MAIN_EXCHANGE = "myExchange";
 	public static final String DLX_QUEUE = "dlx-queue";
+	public static final String MAIN_EXCHANGE = "myExchange";
 	public static final String DLX_EXCHANGE = "dlx-exchange";
 	public static final String DLX_ROUTING_KEY = "dlx-routing-key";
 
@@ -28,7 +30,7 @@ public class RabbitMQConfig {
 	CachingConnectionFactory connectionFactory() {
 
 		CachingConnectionFactory factory = new CachingConnectionFactory();
-		factory.setHost("34.233.171.191");
+		factory.setHost("localhost");
 		factory.setPort(5672);
 		factory.setUsername("guest");
 		factory.setPassword("guest");
@@ -72,4 +74,3 @@ public class RabbitMQConfig {
 		return BindingBuilder.bind(dlxQueue()).to(dlxExchange()).with(DLX_ROUTING_KEY);
 	}
 }
-

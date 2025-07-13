@@ -1,4 +1,4 @@
-package cl.duoc.ms.adm.facturas.service.impl;
+package cl.duoc.cdy2204.msrabbitmq.service.impl;
 
 import java.io.IOException;
 
@@ -11,8 +11,8 @@ import com.rabbitmq.client.Connection;
 import com.rabbitmq.client.ConnectionFactory;
 import com.rabbitmq.client.GetResponse;
 
-import cl.duoc.ms.adm.facturas.config.RabbitMQConfig;
-import cl.duoc.ms.adm.facturas.service.ConsumirMensajeService;
+import cl.duoc.cdy2204.msrabbitmq.config.RabbitMQConfig;
+import cl.duoc.cdy2204.msrabbitmq.service.ConsumirMensajeService;
 
 @Service
 public class ConsumirMensajeServiceImpl implements ConsumirMensajeService {
@@ -24,7 +24,7 @@ public class ConsumirMensajeServiceImpl implements ConsumirMensajeService {
 
 		ConnectionFactory factory = new ConnectionFactory();
 
-		factory.setHost("34.233.171.191");
+		factory.setHost("localhost");
 		factory.setUsername("guest");
 		factory.setPassword("guest");
 
@@ -76,4 +76,3 @@ public class ConsumirMensajeServiceImpl implements ConsumirMensajeService {
 		}
 	}
 }
-
