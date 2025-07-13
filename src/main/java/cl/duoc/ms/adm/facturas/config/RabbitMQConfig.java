@@ -1,5 +1,7 @@
 package cl.duoc.ms.adm.facturas.config;
 
+import java.util.Map;
+
 import org.springframework.amqp.core.Binding;
 import org.springframework.amqp.core.BindingBuilder;
 import org.springframework.amqp.core.DirectExchange;
@@ -72,4 +74,3 @@ public class RabbitMQConfig {
 		return BindingBuilder.bind(dlxQueue()).to(dlxExchange()).with(DLX_ROUTING_KEY);
 	}
 }
-
