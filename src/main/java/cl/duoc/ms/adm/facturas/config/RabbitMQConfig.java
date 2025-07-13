@@ -30,7 +30,7 @@ public class RabbitMQConfig {
 	CachingConnectionFactory connectionFactory() {
 
 		CachingConnectionFactory factory = new CachingConnectionFactory();
-		factory.setHost("34.233.171.191");
+		factory.setHost("host.docker.internal");
 		factory.setPort(5672);
 		factory.setUsername("guest");
 		factory.setPassword("guest");
