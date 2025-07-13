@@ -24,7 +24,7 @@ public class ConsumirMensajeServiceImpl implements ConsumirMensajeService {
 
 		ConnectionFactory factory = new ConnectionFactory();
 
-		factory.setHost("34.233.171.191");
+		factory.setHost("host.docker.internal");
 		factory.setUsername("guest");
 		factory.setPassword("guest");
 
