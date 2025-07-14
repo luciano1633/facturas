@@ -111,6 +111,11 @@ jobs:
             docker rm facturas-app rabbitmq || true
             echo "Contenedores antiguos detenidos y eliminados."
 
+            # Asegurarse de que el puerto 8080 esté libre en el host
+            echo "Verificando y liberando el puerto 8080 en el host..."
+            sudo lsof -t -i:8080 | xargs -r sudo kill -9
+            echo "Puerto 8080 liberado."
+
             echo "Deteniendo y eliminando servicios con Docker Compose..."
             docker-compose down -v --remove-orphans
             echo "Servicios existentes eliminados."
