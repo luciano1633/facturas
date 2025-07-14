@@ -36,11 +36,13 @@ jobs:
       # Paso 5: Construir la imagen de Docker
       - name: Build Docker Image
         run: |
-          docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/my-app:latest .
+          docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/my-app:${{ github.sha }} .
+          docker tag ${{ secrets.DOCKERHUB_USERNAME }}/my-app:${{ github.sha }} ${{ secrets.DOCKERHUB_USERNAME }}/my-app:latest
 
       # Paso 6: Hacer push de la imagen a DockerHub
       - name: Push Docker Image
         run: |
+          docker push ${{ secrets.DOCKERHUB_USERNAME }}/my-app:${{ github.sha }}
           docker push ${{ secrets.DOCKERHUB_USERNAME }}/my-app:latest
           
       # Paso 7: Configurar credenciales de AWS para SSH, incluyendo AWS_SESSION_TOKEN
@@ -95,7 +97,7 @@ jobs:
             echo "En directorio: $(pwd)"
             
             # Exporta el nombre de la imagen como una variable de entorno
-            export DOCKER_IMAGE=${{ secrets.DOCKERHUB_USERNAME }}/my-app:latest
+            export DOCKER_IMAGE=${{ secrets.DOCKERHUB_USERNAME }}/my-app:${{ github.sha }}
             echo "DOCKER_IMAGE: $DOCKER_IMAGE"
             
             # Inicia sesión en DockerHub
@@ -103,9 +105,14 @@ jobs:
             echo ${{ secrets.DOCKERHUB_TOKEN }} | docker login -u ${{ secrets.DOCKERHUB_USERNAME }} --password-stdin
             echo "Sesión en DockerHub iniciada."
             
+            # Detiene y elimina los servicios existentes para asegurar un despliegue limpio
+            echo "Deteniendo y eliminando servicios existentes..."
+            docker-compose down
+            echo "Servicios existentes eliminados."
+
             # Descarga la última versión de la imagen de la aplicación desde Docker Hub
             echo "Descargando imagen de Docker..."
-            docker-compose pull app
+            docker-compose pull ${DOCKER_IMAGE}
             echo "Imagen de Docker descargada."
             
             # Levanta los servicios. --force-recreate asegura que el contenedor de la app se actualice.
