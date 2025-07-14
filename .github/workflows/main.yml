@@ -62,24 +62,54 @@ jobs:
       # Paso 9: Conectarse a EC2 y desplegar con Docker Compose
       - name: Deploy to EC2 with Docker Compose
         run: |
-          ssh -i ~/.ssh/id_rsa -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null ${{ secrets.USER_SERVER }}@${{ secrets.EC2_HOST }} << 'EOF'
+          ssh -T -i ~/.ssh/id_rsa -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null ${{ secrets.USER_SERVER }}@${{ secrets.EC2_HOST }} << 'EOF'
+            echo "Iniciando despliegue en EC2..."
+
+            # Instalar git si no está presente
+            if ! command -v git &> /dev/null
+            then
+                echo "Git no encontrado. Instalando Git..."
+                sudo yum update -y
+                sudo yum install git -y
+            fi
+            echo "Git verificado/instalado."
+
+            # Instalar Docker Compose si no está presente
+            if ! command -v docker-compose &> /dev/null
+            then
+                echo "Docker Compose no encontrado. Instalando Docker Compose..."
+                sudo curl -L "https://github.com/docker/compose/releases/latest/download/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+                sudo chmod +x /usr/local/bin/docker-compose
+            fi
+            echo "Docker Compose verificado/instalado."
+
             # Navega al directorio del proyecto. Si no existe, clona el repositorio.
             if [ -d "facturas" ]; then
+              echo "Directorio 'facturas' encontrado. Actualizando repositorio..."
               cd facturas
               git pull
             else
+              echo "Directorio 'facturas' no encontrado. Clonando repositorio..."
               git clone https://github.com/${{ github.repository }}.git facturas && cd facturas
             fi
+            echo "En directorio: $(pwd)"
             
             # Exporta el nombre de la imagen como una variable de entorno
             export DOCKER_IMAGE=${{ secrets.DOCKERHUB_USERNAME }}/my-app:latest
+            echo "DOCKER_IMAGE: $DOCKER_IMAGE"
             
             # Inicia sesión en DockerHub
+            echo "Iniciando sesión en DockerHub..."
             echo ${{ secrets.DOCKERHUB_TOKEN }} | docker login -u ${{ secrets.DOCKERHUB_USERNAME }} --password-stdin
+            echo "Sesión en DockerHub iniciada."
             
             # Descarga la última versión de la imagen de la aplicación desde Docker Hub
+            echo "Descargando imagen de Docker..."
             docker-compose pull app
+            echo "Imagen de Docker descargada."
             
             # Levanta los servicios. --force-recreate asegura que el contenedor de la app se actualice.
+            echo "Levantando servicios con Docker Compose..."
             docker-compose up -d --force-recreate app
+            echo "Servicios levantados."
           EOF
