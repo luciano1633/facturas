@@ -106,8 +106,13 @@ jobs:
             echo "Sesión en DockerHub iniciada."
             
             # Detiene y elimina los servicios existentes para asegurar un despliegue limpio
-            echo "Deteniendo y eliminando servicios existentes..."
-            docker-compose down
+            echo "Deteniendo y eliminando contenedores antiguos si existen..."
+            docker stop facturas-app rabbitmq || true
+            docker rm facturas-app rabbitmq || true
+            echo "Contenedores antiguos detenidos y eliminados."
+
+            echo "Deteniendo y eliminando servicios con Docker Compose..."
+            docker-compose down -v --remove-orphans
             echo "Servicios existentes eliminados."
 
             # Descarga la última versión de la imagen de la aplicación desde Docker Hub
