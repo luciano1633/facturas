@@ -17,6 +17,8 @@ services:
       retries: 5
       start_period: 30s
     restart: unless-stopped
+    networks:
+      - facturas-net
 
   app:
     image: ${DOCKER_IMAGE}
@@ -32,6 +34,12 @@ services:
       - SPRING_RABBITMQ_USERNAME=guest
       - SPRING_RABBITMQ_PASSWORD=guest
     restart: always
+    networks:
+      - facturas-net
 
 volumes:
   rabbitmq_data:
+
+networks:
+  facturas-net:
+    driver: bridge
