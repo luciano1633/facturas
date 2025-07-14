@@ -68,8 +68,7 @@ jobs:
               cd facturas
               git pull
             else
-              git clone https://github.com/${{ github.repository }}.git facturas
-              cd facturas
+              git clone https://github.com/${{ github.repository }}.git facturas && cd facturas
             fi
             
             # Exporta el nombre de la imagen como una variable de entorno
