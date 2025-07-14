@@ -14,11 +14,12 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class RabbitMQConfig {
 
-	public static final String MAIN_QUEUE = "myQueue";
-	public static final String MAIN_EXCHANGE = "myExchange";
-	public static final String DLX_QUEUE = "dlx-queue";
-	public static final String DLX_EXCHANGE = "dlx-exchange";
-	public static final String DLX_ROUTING_KEY = "dlx-routing-key";
+	public static final String FACTURAS_QUEUE = "facturas-queue";
+	public static final String FACTURAS_EXCHANGE = "facturas-exchange";
+	public static final String FACTURAS_ROUTING_KEY = "facturas.process";
+	public static final String DLX_QUEUE = "facturas-dlq";
+	public static final String DLX_EXCHANGE = "facturas-dlx-exchange";
+	public static final String DLX_ROUTING_KEY = "facturas.dlq";
 
 	@Bean
 	Jackson2JsonMessageConverter messageConverter() {
@@ -35,9 +36,9 @@ public class RabbitMQConfig {
 	}
 
 	@Bean
-	Queue myQueue() {
+	Queue facturasQueue() {
 
-		return new Queue(MAIN_QUEUE, true, false, false,
+		return new Queue(FACTURAS_QUEUE, true, false, false,
 				Map.of("x-dead-letter-exchange", DLX_EXCHANGE, "x-dead-letter-routing-key", DLX_ROUTING_KEY));
 	}
 
@@ -48,9 +49,9 @@ public class RabbitMQConfig {
 	}
 
 	@Bean
-	DirectExchange myExchange() {
+	DirectExchange facturasExchange() {
 
-		return new DirectExchange(MAIN_EXCHANGE);
+		return new DirectExchange(FACTURAS_EXCHANGE);
 	}
 
 	@Bean
@@ -60,9 +61,9 @@ public class RabbitMQConfig {
 	}
 
 	@Bean
-	Binding binding(Queue myQueue, DirectExchange myExchange) {
+	Binding facturasBinding(Queue facturasQueue, DirectExchange facturasExchange) {
 
-		return BindingBuilder.bind(myQueue).to(myExchange).with("");
+		return BindingBuilder.bind(facturasQueue).to(facturasExchange).with(FACTURAS_ROUTING_KEY);
 	}
 
 	@Bean

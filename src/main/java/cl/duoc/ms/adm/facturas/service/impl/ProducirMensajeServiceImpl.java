@@ -18,12 +18,12 @@ public class ProducirMensajeServiceImpl implements ProducirMensajeService {
 	@Override
 	public void enviarMensaje(String mensaje) {
 
-		rabbitTemplate.convertAndSend(RabbitMQConfig.MAIN_QUEUE, mensaje);
+		rabbitTemplate.convertAndSend(RabbitMQConfig.FACTURAS_EXCHANGE, RabbitMQConfig.FACTURAS_ROUTING_KEY, mensaje);
 	}
 
 	@Override
 	public void enviarObjeto(Object objeto) {
 
-		rabbitTemplate.convertAndSend(RabbitMQConfig.MAIN_QUEUE, objeto);
+		rabbitTemplate.convertAndSend(RabbitMQConfig.FACTURAS_EXCHANGE, RabbitMQConfig.FACTURAS_ROUTING_KEY, objeto);
 	}
 }

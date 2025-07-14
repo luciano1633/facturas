@@ -44,7 +44,7 @@ public class ConsumirMensajeServiceImpl implements ConsumirMensajeService {
 		factory.setPassword("guest");
 
 		try (Connection connection = factory.newConnection(); Channel channel = connection.createChannel()) {
-			GetResponse response = channel.basicGet("myQueue", true);
+			GetResponse response = channel.basicGet(RabbitMQConfig.FACTURAS_QUEUE, true);
 			if (response != null) {
 				mensaje = new String(response.getBody(), "UTF-8");
 			}
@@ -57,10 +57,10 @@ public class ConsumirMensajeServiceImpl implements ConsumirMensajeService {
 	@Override
 	public void recibirMensaje(Object objeto) {
 		// Este listener no se usa, el que tiene ACK manual es el principal.
-		System.out.println("Mensaje recibido en myQueue: " + objeto);
+		System.out.println("Mensaje recibido en facturas-queue: " + objeto);
 	}
 
-	@RabbitListener(id = "listener-myQueue", queues = RabbitMQConfig.MAIN_QUEUE, ackMode = "MANUAL")
+	@RabbitListener(id = "listener-facturas-queue", queues = RabbitMQConfig.FACTURAS_QUEUE, ackMode = "MANUAL")
 	@Override
 	public void recibirMensajeConAckManual(Message mensaje, Channel canal) throws IOException {
 		Factura factura = null;
