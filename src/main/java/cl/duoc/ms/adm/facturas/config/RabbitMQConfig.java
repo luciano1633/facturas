@@ -28,14 +28,6 @@ public class RabbitMQConfig {
 	}
 
 	@Bean
-	CachingConnectionFactory connectionFactory() {
-
-		CachingConnectionFactory factory = new CachingConnectionFactory();
-
-		return factory;
-	}
-
-	@Bean
 	Queue facturasQueue() {
 
 		return new Queue(FACTURAS_QUEUE, true, false, false,
