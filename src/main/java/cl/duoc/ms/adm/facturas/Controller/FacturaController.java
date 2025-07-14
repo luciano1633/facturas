@@ -4,6 +4,7 @@ import cl.duoc.ms.adm.facturas.dto.FacturaDTO;
 import cl.duoc.ms.adm.facturas.dto.DetalleFacturaDTO;
 import cl.duoc.ms.adm.facturas.model.Factura;
 import cl.duoc.ms.adm.facturas.service.FacturaService;
+import cl.duoc.ms.adm.facturas.service.ProducirMensajeService;
 import cl.duoc.ms.adm.facturas.model.DetalleFactura;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -18,9 +19,11 @@ import java.util.stream.Collectors;
 @RequestMapping("/facturas")
 public class FacturaController {
     private final FacturaService facturaService;
+    private final ProducirMensajeService producirMensajeService;
 
-    public FacturaController(FacturaService facturaService) {
+    public FacturaController(FacturaService facturaService, ProducirMensajeService producirMensajeService) {
         this.facturaService = facturaService;
+        this.producirMensajeService = producirMensajeService;
     }
 
     @GetMapping
@@ -39,11 +42,10 @@ public class FacturaController {
 
     @PostMapping
     public ResponseEntity<String> agregar(@RequestBody FacturaDTO facturaDTO) {
-        Factura factura = toEntity(facturaDTO);
-        if (factura.getFecha() == null) {
-            factura.setFecha(LocalDateTime.now());
+        if (facturaDTO.getFecha() == null) {
+            facturaDTO.setFecha(LocalDateTime.now());
         }
-        facturaService.guardarFactura(factura);
+        producirMensajeService.enviarObjeto(facturaDTO);
         String mensaje = "Solicitud de factura recibida. Se está procesando de forma asíncrona.";
         return ResponseEntity.accepted().body(mensaje);
     }
