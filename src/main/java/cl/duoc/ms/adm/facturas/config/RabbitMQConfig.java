@@ -30,12 +30,7 @@ public class RabbitMQConfig {
 	CachingConnectionFactory connectionFactory() {
 
 		CachingConnectionFactory factory = new CachingConnectionFactory();
-		// Al usar Docker Compose, la aplicación se conecta al servicio de RabbitMQ
-        // usando el nombre del servicio como hostname.
-		factory.setHost("rabbitmq");
-		factory.setPort(5672);
-		factory.setUsername("guest");
-		factory.setPassword("guest");
+
 		return factory;
 	}
 
