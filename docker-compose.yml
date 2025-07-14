@@ -21,7 +21,7 @@ services:
       - facturas-net
 
   app:
-    image: ${DOCKER_IMAGE}
+    build: .
     container_name: facturas-app
     depends_on:
       rabbitmq:
