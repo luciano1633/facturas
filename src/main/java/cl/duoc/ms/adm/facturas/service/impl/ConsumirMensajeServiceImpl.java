@@ -91,7 +91,8 @@ public class ConsumirMensajeServiceImpl implements ConsumirMensajeService {
 
 			// 4. Subir el PDF a S3
 			String key = generarKeyS3(facturaGuardada);
-			awsS3Service.upload(BUCKET_NAME, key, baos.toByteArray());
+			// awsS3Service.upload(BUCKET_NAME, key, baos.toByteArray()); // Comentado para simulación por falta de permisos IAM
+			System.out.println("SIMULACIÓN: El archivo se hubiera subido a S3 con la clave: " + key);
 			facturaGuardada.setArchivoPath(key);
 
 			// 5. Actualizar la factura con la ruta del archivo S3
