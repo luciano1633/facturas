@@ -130,9 +130,14 @@ jobs:
             docker images | grep my-app
             
             # Crear archivo .env para docker-compose
-            echo "Creando archivo .env con la variable DOCKER_IMAGE..."
+            echo "Creando archivo .env con las variables de entorno..."
             echo "DOCKER_IMAGE=${DOCKER_IMAGE}" > .env
-            cat .env
+            echo "AWS_ACCESS_KEY_ID=${{ secrets.AWS_ACCESS_KEY_ID }}" >> .env
+            echo "AWS_SECRET_ACCESS_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY }}" >> .env
+            echo "AWS_SESSION_TOKEN=${{ secrets.AWS_SESSION_TOKEN }}" >> .env
+            echo "AWS_REGION=us-east-1" >> .env
+            echo "Archivo .env creado."
+            # No imprimimos el contenido para no exponer secretos en los logs
             
             # Levanta los servicios. --force-recreate asegura que el contenedor de la app se actualice.
             echo "Levantando servicios con Docker Compose..."
