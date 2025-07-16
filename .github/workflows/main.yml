@@ -85,15 +85,12 @@ jobs:
             fi
             echo "Docker Compose verificado/instalado."
 
-            # Navega al directorio del proyecto. Si no existe, clona el repositorio.
-            if [ -d "facturas" ]; then
-              echo "Directorio 'facturas' encontrado. Actualizando repositorio..."
-              cd facturas
-              git pull
-            else
-              echo "Directorio 'facturas' no encontrado. Clonando repositorio..."
-              git clone https://github.com/${{ github.repository }}.git facturas && cd facturas
-            fi
+            # Elimina el directorio antiguo para asegurar un clonado limpio
+            echo "Eliminando directorio 'facturas' antiguo si existe..."
+            rm -rf facturas
+            echo "Clonando una copia fresca del repositorio..."
+            git clone https://github.com/${{ github.repository }}.git facturas
+            cd facturas
             echo "En directorio: $(pwd)"
             
             # Exporta el nombre de la imagen como una variable de entorno
